@@ -1,0 +1,569 @@
+%%%%%%%%%%%project Communications 3%%%%%%%%%%%%%%%
+close all;
+clear;
+clc;
+
+
+num_bits=540000;               %define number of bits 
+random_bits=randi([0 1],1,num_bits);        %generate random data
+
+%%%%%%%%BPSK%%%%%%
+Eb_BPSK=1;    
+symbol_BPSK=zeros(1,num_bits);
+Demapped_BPSK=zeros(1,num_bits);
+%%%%%%%%%maping BPSK%%%%%%%
+symbol_BPSK=random_bits.*2-1;      %%maping random data to Bpsk
+%%%%%%%%%Noisy Channel%%%%%%%
+SNR_range=[-4:14];
+
+N0=Eb_BPSK./(10.^(SNR_range/10));
+for i=1:length(SNR_range)
+AWGN_channel=randn(1,num_bits)*sqrt(N0(i)/2);     %%generate gaussian noise
+data_BPSK_channel=symbol_BPSK+AWGN_channel;   %%add noise to symbols
+
+%%demapping%%
+for n=1:num_bits
+if data_BPSK_channel(n)>=0
+Demapped_BPSK(n)=1;
+else
+Demapped_BPSK(n)=0;
+end
+end
+num_error_BPSK=0;
+for n=1:num_bits
+if Demapped_BPSK(n)~=random_bits(n)
+num_error_BPSK=num_error_BPSK+1;
+end
+end
+BER_BPSK(i)=num_error_BPSK/num_bits;
+end
+BER_BPSK_theoritcal=0.5*erfc(sqrt(10.^(SNR_range/10)));
+figure
+semilogy(SNR_range,BER_BPSK,'b') ; 
+hold on;
+semilogy( SNR_range , BER_BPSK_theoritcal ,'r--') ; 
+xlabel('Eb/No (dB)'); 
+ylabel('BER'); 
+ylim([10^-4 , 1]);
+legend('Actual BER' , 'Theoretical BER ') ; 
+grid on 
+title('BPSK Modulation'); 
+saveas(gcf, fullfile('G:\Comm3', 'BPSK.jpg'),'jpg');
+
+%%%%%%%%%%%%%%%%%%QPSK%%%%%%%%%%%%%%%%%%%
+symbol_QPSK=zeros(1,(num_bits/2));          %two bits are represented in one symbol
+Demapped_QPSK=zeros(1,num_bits);
+%%%%%maping%%%%%%%%
+for i=1:2:num_bits
+if [random_bits(i) random_bits(i+1)]==[1 1]
+symbol_QPSK(floor(i/2+1))=1+1j;
+elseif [random_bits(i) random_bits(i+1)]==[0 1]
+symbol_QPSK(floor(i/2+1))=-1+1j;
+elseif [random_bits(i) random_bits(i+1)]==[1 0]
+symbol_QPSK(floor(i/2+1))=1-1j;
+elseif [random_bits(i) random_bits(i+1)]==[0 0]
+symbol_QPSK(floor(i/2+1))=-1-1j;
+end
+end
+Eb_QPSK=1;
+Es_QPSK=2*Eb_QPSK;
+N0_QPSK=Eb_QPSK./(10.^(SNR_range/10));
+for i=1:length(SNR_range)
+AWGN_channel_QPSK=randn(1,num_bits/2)*sqrt(N0_QPSK(i)/2)+1j*randn(1,num_bits/2)*sqrt(N0_QPSK(i)/2);     %%generate gaussian noise
+data_QPSK_channel=symbol_QPSK+AWGN_channel_QPSK;   %%add noise to symbols
+
+%%Demapping%%
+for n=1:num_bits/2
+if real(data_QPSK_channel(n)) >=0 && imag(data_QPSK_channel(n)) >=0
+Demapped_QPSK(n*2-1)=1;
+Demapped_QPSK(n*2)=1;
+elseif  real(data_QPSK_channel(n)) >=0 && imag(data_QPSK_channel(n))<0
+Demapped_QPSK(n*2-1)=1;
+Demapped_QPSK(n*2)=0;
+elseif  real(data_QPSK_channel(n)) <0 && imag(data_QPSK_channel(n))>=0
+Demapped_QPSK(n*2-1)=0;
+Demapped_QPSK(n*2)=1;
+elseif  real(data_QPSK_channel(n)) <0 && imag(data_QPSK_channel(n))<0
+Demapped_QPSK(n*2-1)=0;
+Demapped_QPSK(n*2)=0;
+end
+end
+num_error_QPSK=0;
+for k=1:num_bits
+if Demapped_QPSK(k)~=random_bits(k)
+num_error_QPSK=num_error_QPSK+1;
+end 
+end
+BER_QPSK(i)=num_error_QPSK/num_bits;
+end
+BER_QPSK_theortical=0.5*erfc(sqrt(10.^(SNR_range/10)));
+figure
+semilogy(SNR_range,BER_QPSK,'b') ; 
+hold on;
+semilogy( SNR_range , BER_QPSK_theortical,'r--') ; 
+xlabel('Eb/No (dB)'); 
+ylabel('BER'); 
+ylim([10^-4 , 1]);
+legend('Actual BER' , 'Theoretical BER ') ; 
+grid on 
+title('QPSK Modulation'); 
+saveas(gcf, fullfile('G:\Comm3', 'QPSK.jpg'),'jpg');
+
+
+
+%%%%%%%%%%% QPSK NOT GRAY CODE%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%QPSK%%%%%%%%%%%%%%%%%%%
+symbol_QPSK_not_grey=zeros(1,(num_bits/2));          %two bits are represented in one symbol
+Demapped_QPSK_not_grey=zeros(1,num_bits);
+%%%%%maping%%%%%%%%
+for i=1:2:num_bits
+if [random_bits(i) random_bits(i+1)]==[1 1]
+symbol_QPSK_not_grey(floor(i/2+1))=1-1j;
+elseif [random_bits(i) random_bits(i+1)]==[0 1]
+symbol_QPSK_not_grey(floor(i/2+1))=-1+1j;
+elseif [random_bits(i) random_bits(i+1)]==[1 0]
+symbol_QPSK_not_grey(floor(i/2+1))=1+1j;
+elseif [random_bits(i) random_bits(i+1)]==[0 0]
+symbol_QPSK_not_grey(floor(i/2+1))=-1-1j;
+end
+end
+Eb_QPSK_not_grey=1;
+Es_QPSK_not_grey=2*Eb_QPSK_not_grey;
+N0_QPSK_not_grey=Eb_QPSK_not_grey./(10.^(SNR_range/10));
+for i=1:length(SNR_range)
+AWGN_channel_QPSK_not_grey=randn(1,num_bits/2)*sqrt(N0_QPSK_not_grey(i)/2)+1j*randn(1,num_bits/2)*sqrt(N0_QPSK_not_grey(i)/2);     %%generate gaussian noise
+data_QPSK_channel_not_grey=symbol_QPSK_not_grey+AWGN_channel_QPSK_not_grey;   %%add noise to symbols
+
+%%Demapping%%
+for n=1:num_bits/2
+if real(data_QPSK_channel_not_grey(n)) >=0 && imag(data_QPSK_channel_not_grey(n)) >=0
+Demapped_QPSK_not_grey(n*2-1)=1;
+Demapped_QPSK_not_grey(n*2)=0;
+elseif  real(data_QPSK_channel_not_grey(n)) >=0 && imag(data_QPSK_channel_not_grey(n))<0
+Demapped_QPSK_not_grey(n*2-1)=1;
+Demapped_QPSK_not_grey(n*2)=1;
+elseif  real(data_QPSK_channel_not_grey(n)) <0 && imag(data_QPSK_channel_not_grey(n))>=0
+Demapped_QPSK_not_grey(n*2-1)=0;
+Demapped_QPSK_not_grey(n*2)=1;
+elseif  real(data_QPSK_channel_not_grey(n)) <0 && imag(data_QPSK_channel_not_grey(n))<0
+Demapped_QPSK_not_grey(n*2-1)=0;
+Demapped_QPSK_not_grey(n*2)=0;
+end
+end
+num_error_QPSK_not_grey=0;
+for k=1:num_bits
+if Demapped_QPSK_not_grey(k)~=random_bits(k)
+num_error_QPSK_not_grey=num_error_QPSK_not_grey+1;
+end 
+end
+BER_QPSK_not_grey(i)=num_error_QPSK_not_grey/num_bits;
+end
+%BER_QPSK_theortical_not_grey=erfc(sqrt(10.^(SNR_range/10)));
+figure;
+semilogy(SNR_range,BER_QPSK_not_grey,'b') ; 
+hold on;
+%semilogy( SNR_range , BER_QPSK_theortical_not_grey,'r--') ; 
+xlabel('Eb/No (dB)'); 
+ylabel('BER'); 
+ylim([10^-4 , 1]);
+legend('Actual BER' , 'Theoretical BER ') ; 
+grid on 
+title('QPSK NOT GREY Modulation'); 
+saveas(gcf, fullfile('G:\Comm3', 'QPSK_not_grey.jpg'),'jpg');
+figure;    %grey QPSK and NOT GREY QPSK
+semilogy(SNR_range,BER_QPSK,'b') ; 
+hold on;
+semilogy( SNR_range , BER_QPSK_not_grey,'r') ; 
+xlabel('Eb/No (dB)'); 
+ylabel('BER'); 
+ylim([10^-4 , 1]);
+legend('Grey QPSK BER' , 'Non Grey QPSK BER') ; 
+grid on 
+title('QPSK GREY VS QPSK NOT GREY Modulation'); 
+saveas(gcf, fullfile('G:\Comm3', 'greyVsnot.jpg'),'jpg');
+
+
+
+%%%%%%%%%%%%%%%8PSK%%%%%%%%%%%%%%%%%%
+symbol_8PSK=zeros(1,(num_bits/3));          %three bits are represented in one symbol
+Demapped_8PSK=zeros(1,num_bits);
+%%%%%maping%%%%%%%%
+for i=1:3:num_bits
+if [random_bits(i) random_bits(i+1) random_bits(i+2)]==[0 0 0]
+symbol_8PSK(floor(i/3+1))=cos(0)+1j*sin(0);
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2)]==[0 0 1]
+symbol_8PSK(floor(i/3+1))=cos(pi/4)+1j*sin(pi/4);
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2)]==[0 1 1]
+symbol_8PSK(floor(i/3+1))=cos(pi/2)+1j*sin(pi/2);
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2)]==[0 1 0]
+symbol_8PSK(floor(i/3+1))=cos(3*pi/4)+1j*sin(3*pi/4);
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2)]==[1 1 0]
+symbol_8PSK(floor(i/3+1))=cos(pi)+1j*sin(pi);
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2)]==[1 1 1]
+symbol_8PSK(floor(i/3+1))=cos(5*pi/4)+1j*sin(5*pi/4);
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2)]==[1 0 1]
+symbol_8PSK(floor(i/3+1))=cos(6*pi/4)+1j*sin(6*pi/4);
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2)]==[1 0 0]
+symbol_8PSK(floor(i/3+1))=cos(7*pi/4)+1j*sin(7*pi/4);
+end
+end
+Es_8PSK=1;
+Eb_8PSK=Es_8PSK/3;
+N0_8PSK=Eb_8PSK./(10.^(SNR_range/10));
+for i=1:length(SNR_range)
+AWGN_channel_8PSK=randn(1,num_bits/3)*sqrt(N0_8PSK(i)/2)+1j*randn(1,num_bits/3)*sqrt(N0_8PSK(i)/2);     %%generate gaussian noise
+data_8PSK_channel=symbol_8PSK+AWGN_channel_8PSK;   %%add noise to symbols
+
+%%Demapping%%
+%%%%%% demaping here be check region using angles 
+for n=1:num_bits/3
+if angle(data_8PSK_channel(n)) >=-pi/8 && angle(data_8PSK_channel(n)) <pi/8
+Demapped_8PSK(n*3-2)=0;
+Demapped_8PSK(n*3-1)=0;
+Demapped_8PSK(n*3)=0;
+elseif angle(data_8PSK_channel(n)) >=pi/8 && angle(data_8PSK_channel(n)) <3*pi/8
+Demapped_8PSK(n*3-2)=0;
+Demapped_8PSK(n*3-1)=0;
+Demapped_8PSK(n*3)=1;
+elseif angle(data_8PSK_channel(n)) >=3*pi/8 && angle(data_8PSK_channel(n)) <5*pi/8
+Demapped_8PSK(n*3-2)=0;
+Demapped_8PSK(n*3-1)=1;
+Demapped_8PSK(n*3)=1;
+elseif angle(data_8PSK_channel(n)) >=5*pi/8 && angle(data_8PSK_channel(n)) <7*pi/8
+Demapped_8PSK(n*3-2)=0;
+Demapped_8PSK(n*3-1)=1;
+Demapped_8PSK(n*3)=0;
+elseif angle(data_8PSK_channel(n)) >=-7*pi/8 && angle(data_8PSK_channel(n)) <-5*pi/8
+Demapped_8PSK(n*3-2)=1;
+Demapped_8PSK(n*3-1)=1;
+Demapped_8PSK(n*3)=1;
+elseif angle(data_8PSK_channel(n)) >=-5*pi/8 && angle(data_8PSK_channel(n)) <-3*pi/8
+Demapped_8PSK(n*3-2)=1;
+Demapped_8PSK(n*3-1)=0;
+Demapped_8PSK(n*3)=1;
+elseif angle(data_8PSK_channel(n)) >=-3*pi/8 && angle(data_8PSK_channel(n)) <-pi/8
+Demapped_8PSK(n*3-2)=1;
+Demapped_8PSK(n*3-1)=0;
+Demapped_8PSK(n*3)=0;
+else
+Demapped_8PSK(n*3-2)=1;
+Demapped_8PSK(n*3-1)=1;
+Demapped_8PSK(n*3)=0;
+
+end
+end
+num_error_8PSK=0;
+for k=1:num_bits
+if Demapped_8PSK(k)~=random_bits(k)
+num_error_8PSK=num_error_8PSK+1;
+end 
+end
+BER_8PSK(i)=num_error_8PSK/num_bits;
+end
+BER_8PSK_theortical=1/3*erfc(sqrt(3*(10.^(SNR_range/10)))*sin(pi/8));
+figure
+semilogy(SNR_range,BER_8PSK,'b') ; 
+hold on;
+semilogy( SNR_range , BER_8PSK_theortical,'r--') ; 
+xlabel('Eb/No (dB)'); 
+ylabel('BER'); 
+ylim([10^-4 , 1]);
+legend('Actual BER' , 'Theoretical BER ') ; 
+grid on 
+title('8PSK Modulation');
+saveas(gcf, fullfile('G:\Comm3', 'EightPSK.jpg'),'jpg');
+
+
+
+%%%%%%%%%%%%%%%%%%%16 QAM%%%%%%%%%%%%%%%%%%%
+
+
+symbol_16QAM=zeros(1,(num_bits/4));          %FOUR bits are represented in one symbol
+Demapped_16QAM=zeros(1,num_bits);
+%%%%%maping%%%%%%%%
+for i=1:4:num_bits
+if [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[0 0 0 0]
+symbol_16QAM(floor(i/4+1))=-3-3j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[0 0 0 1]
+symbol_16QAM(floor(i/4+1))=-3-1j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[0 0 1 0]
+symbol_16QAM(floor(i/4+1))=-3+3j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[0 0 1 1]
+symbol_16QAM(floor(i/4+1))=-3+1j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[0 1 0 0]
+symbol_16QAM(floor(i/4+1))=-1-3j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[0 1 0 1]
+symbol_16QAM(floor(i/4+1))=-1-1j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[0 1 1 0]
+symbol_16QAM(floor(i/4+1))=-1+3j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[0 1 1 1]
+symbol_16QAM(floor(i/4+1))=-1+1j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[1 0 0 0]
+symbol_16QAM(floor(i/4+1))=3-3j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[1 0 0 1]
+symbol_16QAM(floor(i/4+1))=3-1j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[1 0 1 0]
+symbol_16QAM(floor(i/4+1))=3+3j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[1 0 1 1]
+symbol_16QAM(floor(i/4+1))=3+1j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[1 1 0 0]
+symbol_16QAM(floor(i/4+1))=1-3j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[1 1 0 1]
+symbol_16QAM(floor(i/4+1))=1-1j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[1 1 1 0]
+symbol_16QAM(floor(i/4+1))=1+3j;
+elseif [random_bits(i) random_bits(i+1) random_bits(i+2) random_bits(i+3)]==[1 1 1 1]
+symbol_16QAM(floor(i/4+1))=1+1j;
+end
+end
+Es_16QAM=10;
+Eb_16QAM=Es_16QAM/4;
+N0_16QAM=Eb_16QAM./(10.^(SNR_range/10));
+for i=1:length(SNR_range)
+AWGN_channel_16QAM=randn(1,num_bits/4)*sqrt(N0_16QAM(i)/2)+1j*randn(1,num_bits/4)*sqrt(N0_16QAM(i)/2);     %%generate gaussian noise
+data_16QAM_channel=symbol_16QAM+AWGN_channel_16QAM;   %%add noise to symbols
+
+%%Demapping%%
+%%%%%% demaping here be check region  
+for n=1:num_bits/4
+if real(data_16QAM_channel(n))<-2 && imag(data_16QAM_channel(n))<-2
+Demapped_16QAM(n*4-3)=0;
+Demapped_16QAM(n*4-2)=0;
+Demapped_16QAM(n*4-1)=0;
+Demapped_16QAM(n*4)=0;
+elseif real(data_16QAM_channel(n))<-2 && imag(data_16QAM_channel(n))>=-2 &&imag(data_16QAM_channel(n))<0
+Demapped_16QAM(n*4-3)=0;
+Demapped_16QAM(n*4-2)=0;
+Demapped_16QAM(n*4-1)=0;
+Demapped_16QAM(n*4)=1;
+elseif real(data_16QAM_channel(n))<-2 && imag(data_16QAM_channel(n))>=0 &&imag(data_16QAM_channel(n))<2
+Demapped_16QAM(n*4-3)=0;
+Demapped_16QAM(n*4-2)=0;
+Demapped_16QAM(n*4-1)=1;
+Demapped_16QAM(n*4)=1;
+elseif real(data_16QAM_channel(n))<-2 && imag(data_16QAM_channel(n))>=2
+Demapped_16QAM(n*4-3)=0;
+Demapped_16QAM(n*4-2)=0;
+Demapped_16QAM(n*4-1)=1;
+Demapped_16QAM(n*4)=0;
+elseif real(data_16QAM_channel(n))>=-2 && imag(data_16QAM_channel(n))<-2 &&real(data_16QAM_channel(n))<0
+Demapped_16QAM(n*4-3)=0;
+Demapped_16QAM(n*4-2)=1;
+Demapped_16QAM(n*4-1)=0;
+Demapped_16QAM(n*4)=0;
+elseif real(data_16QAM_channel(n))>=-2 && imag(data_16QAM_channel(n))>=-2 &&real(data_16QAM_channel(n))<0 && imag(data_16QAM_channel(n))<0
+Demapped_16QAM(n*4-3)=0;
+Demapped_16QAM(n*4-2)=1;
+Demapped_16QAM(n*4-1)=0;
+Demapped_16QAM(n*4)=1;
+elseif real(data_16QAM_channel(n))>=-2 && imag(data_16QAM_channel(n))<2 && real(data_16QAM_channel(n))<0 && imag(data_16QAM_channel(n))>0
+Demapped_16QAM(n*4-3)=0;
+Demapped_16QAM(n*4-2)=1;
+Demapped_16QAM(n*4-1)=1;
+Demapped_16QAM(n*4)=1;
+elseif real(data_16QAM_channel(n))>=-2 && imag(data_16QAM_channel(n))>=2 && real(data_16QAM_channel(n))<0
+Demapped_16QAM(n*4-3)=0;
+Demapped_16QAM(n*4-2)=1;
+Demapped_16QAM(n*4-1)=1;
+Demapped_16QAM(n*4)=0;
+elseif real(data_16QAM_channel(n))>=0 && imag(data_16QAM_channel(n))<-2  && real(data_16QAM_channel(n))<2
+Demapped_16QAM(n*4-3)=1;
+Demapped_16QAM(n*4-2)=1;
+Demapped_16QAM(n*4-1)=0;
+Demapped_16QAM(n*4)=0;
+elseif real(data_16QAM_channel(n))>=0 && imag(data_16QAM_channel(n))>=-2 && real(data_16QAM_channel(n))<2 && imag(data_16QAM_channel(n))<0
+Demapped_16QAM(n*4-3)=1;
+Demapped_16QAM(n*4-2)=1;
+Demapped_16QAM(n*4-1)=0;
+Demapped_16QAM(n*4)=1;
+elseif real(data_16QAM_channel(n))>=0 && imag(data_16QAM_channel(n))>=0 && real(data_16QAM_channel(n))<2 && imag(data_16QAM_channel(n))<2
+Demapped_16QAM(n*4-3)=1;
+Demapped_16QAM(n*4-2)=1;
+Demapped_16QAM(n*4-1)=1;
+Demapped_16QAM(n*4)=1;
+elseif real(data_16QAM_channel(n))>=0 && imag(data_16QAM_channel(n))>=2 &&real(data_16QAM_channel(n))<2
+Demapped_16QAM(n*4-3)=1;
+Demapped_16QAM(n*4-2)=1;
+Demapped_16QAM(n*4-1)=1;
+Demapped_16QAM(n*4)=0;
+elseif real(data_16QAM_channel(n))>=2 && imag(data_16QAM_channel(n))<-2
+Demapped_16QAM(n*4-3)=1;
+Demapped_16QAM(n*4-2)=0;
+Demapped_16QAM(n*4-1)=0;
+Demapped_16QAM(n*4)=0;
+elseif real(data_16QAM_channel(n))>=2 && imag(data_16QAM_channel(n))>=-2 && imag(data_16QAM_channel(n))<0
+Demapped_16QAM(n*4-3)=1;
+Demapped_16QAM(n*4-2)=0;
+Demapped_16QAM(n*4-1)=0;
+Demapped_16QAM(n*4)=1;
+elseif real(data_16QAM_channel(n))>=2 && imag(data_16QAM_channel(n))>=0 && imag(data_16QAM_channel(n))<2
+Demapped_16QAM(n*4-3)=1;
+Demapped_16QAM(n*4-2)=0;
+Demapped_16QAM(n*4-1)=1;
+Demapped_16QAM(n*4)=1;
+elseif real(data_16QAM_channel(n))>=2 && imag(data_16QAM_channel(n))>=2
+Demapped_16QAM(n*4-3)=1;
+Demapped_16QAM(n*4-2)=0;
+Demapped_16QAM(n*4-1)=1;
+Demapped_16QAM(n*4)=0;
+end
+end
+num_error_16QAM=0;
+for k=1:num_bits
+if Demapped_16QAM(k)~=random_bits(k)
+num_error_16QAM=num_error_16QAM+1;
+end 
+end
+BER_16QAM(i)=num_error_16QAM/num_bits;
+end
+BER_16QAM_theortical=3/8*erfc(sqrt((10.^(SNR_range/10))/2.5));
+figure
+semilogy(SNR_range,BER_16QAM,'b') ; 
+hold on;
+semilogy( SNR_range , BER_16QAM_theortical,'r--') ; 
+ylim([10^-2,1]);
+xlabel('Eb/No (dB)'); 
+ylabel('BER'); 
+ylim([10^-4 , 1]);
+legend('Actual BER' , 'Theoretical BER ') ; 
+grid on 
+title('16QAM Modulation'); 
+saveas(gcf, fullfile('G:\Comm3', 'SixteebQAM.jpg'),'jpg');
+
+%%%%%%%%%%%%Plot all%%%%%%%%%%%%%%%%%%%
+
+figure
+semilogy(SNR_range,BER_BPSK ,'Color','b') ; 
+hold on;
+semilogy(SNR_range,BER_QPSK , 'Color','m') ; 
+semilogy(SNR_range,BER_8PSK , 'Color','g') ; 
+semilogy(SNR_range,BER_16QAM , 'Color','r') ; 
+semilogy( SNR_range , BER_BPSK_theoritcal  ,'--' , 'Color', 'c') ; 
+semilogy( SNR_range , BER_QPSK_theortical ,'--' , 'Color','k' ) ; 
+semilogy( SNR_range , BER_8PSK_theortical ,'--' , 'Color', 'y') ; 
+semilogy( SNR_range , BER_16QAM_theortical  ,'--' , 'Color',[0.5, 0.2, 0.8]) ; 
+xlabel('Eb/No (dB)'); 
+ylabel('BER'); 
+ylim([10^-4 , 1]);
+legend('Actual BPSK' , 'Actual QPSK' , 'Actual 8PSK' , 'Actual 16QAM' , 'Theoretical BPSK' , 'Theoretical QPSK' , 'Theoretical 8PSK' , 'Theoretical 16QAM') ; 
+title('BPSK & QPSK & 8PSK & 16QAM'); 
+saveas(gcf, fullfile('G:\Comm3', 'ALL.jpg'),'jpg');
+hold off;
+%%%%%%%%%%%%%%%BFSK%%%%%%%%%%%%%%%%%%%%%%
+Eb_BFSK=1;    
+symbol_BFSK=zeros(1,num_bits);
+Demapped_BFSK=zeros(1,num_bits);
+%%%%%%%%%maping BFSK%%%%%%%
+for k=1:num_bits
+if random_bits(k)== 1
+symbol_BFSK(k)=1;
+else
+symbol_BFSK(k)=1j;
+end 
+end
+
+%%%%%%%%%Noisy Channel%%%%%%%
+N0_BFSK=Eb_BFSK./(10.^(SNR_range/10));
+for i=1:length(SNR_range)
+AWGN_channel_BFSK=randn(1,num_bits)*sqrt(N0_BFSK(i)/2)+1j*randn(1,num_bits)*sqrt(N0_BFSK(i)/2);     %%generate gaussian noise
+data_BFSK_channel=symbol_BFSK+AWGN_channel_BFSK;   %%add noise to symbols
+
+%%demapping%%
+for n=1:num_bits
+if angle(data_BFSK_channel(n))>=-3*pi/4 && angle(data_BFSK_channel(n))<pi/4
+Demapped_BFSK(n)=1;
+else
+Demapped_BFSK(n)=0;
+end
+end
+num_error_BFSK=0;
+for n=1:num_bits
+if Demapped_BFSK(n)~=random_bits(n)
+num_error_BFSK=num_error_BFSK+1;
+end
+end
+BER_BFSK(i)=num_error_BFSK/num_bits;
+end
+BER_BFSK_theoritcal=0.5*erfc(sqrt(10.^(SNR_range/10)/2));
+figure
+semilogy(SNR_range,BER_BFSK,'b') ; 
+hold on;
+semilogy( SNR_range , BER_BFSK_theoritcal ,'r--') ; 
+xlabel('Eb/No (dB)'); 
+ylabel('BER'); 
+ylim([10^-4 , 1]);
+legend('Actual BER' , 'Theoretical BER ') ; 
+grid on 
+title('BFSK Modulation'); 
+saveas(gcf, fullfile('G:\Comm3', 'BFSK.jpg'),'jpg');
+%%%%%%%%%%%%%%%%%PSD BFSK%%%%%%%%%%%%%%%%%%%%%%%
+
+ensemble_size = 25000; 
+num_bits_PSD = 100; 
+Eb_BFSK = 1;
+bit_time = 7; 
+sampling_time = 1; 
+%numbers of samples in on bit=7
+num_samples_bit = bit_time / sampling_time; 
+num_samples = num_samples_bit*num_bits_PSD; 
+
+S1_BB =sqrt(2*Eb_BFSK/(bit_time));
+step = (bit_time/num_samples_bit);
+t = 0: step :bit_time - (bit_time/num_samples_bit);
+S2_BB = sqrt(2*Eb_BFSK/(bit_time))*cos(2*pi*(1/bit_time)*t)+1i*sqrt(2*Eb_BFSK/(bit_time))*sin(2*pi*(1/bit_time)*t);
+
+    
+
+data_PSD = randi([0,1], ensemble_size, num_bits_PSD+1); 
+%secondly, storing the data after transforming it form bits to symbols
+data_symbols=zeros(ensemble_size,(num_bits_PSD+1)*num_samples_bit);
+for i=1:ensemble_size
+     for j = 1:num_bits_PSD+1
+        if data_PSD(i,j)
+            for k = 0 : num_samples_bit-1
+                data_symbols(i,num_samples_bit*(j-1)+1+k)= S2_BB(k+1);
+            end
+        else
+            for k = 0 : num_samples_bit-1
+                data_symbols(i,num_samples_bit*(j-1)+1+k)= S1_BB;
+             end
+        end
+     end
+end
+
+td = randi([0,(num_samples_bit-1)],ensemble_size,1);
+data = zeros(ensemble_size, num_samples);
+for i = 1:ensemble_size
+    data(i,:)= data_symbols(i, td(i)+1 : num_samples + td(i));
+end
+stat_autocorr = zeros(size(data(1,1:end)));
+for i = (-num_samples/2+1) : num_samples/2
+    stat_autocorr(1,num_samples/2+i) = sum((conj(data(:,num_samples/2)) .* data(:,num_samples/2+i))) / ensemble_size;
+end
+%stat_autocorr = cat (2, conj(fliplr(stat_autocorr(2:num_samples))), stat_autocorr);
+k = -num_samples + 1: num_samples - 1;
+k = [1:700];
+fs = 1;
+Freq = (-num_bits_PSD*7/2:num_bits_PSD*7/2-1) * fs/(num_bits_PSD*7) ;
+%Scale by Tb
+FrequencyNoramlize= Freq*bit_time;
+FirstDelta = 100*double(abs(Freq - 1/(2*bit_time)) < 0.00001); % Tolerance set to 0.00001
+SecondDelta = 100*double(abs(Freq + 1/(2*bit_time)) < 0.00001); % Tolerance set to 0.00001
+PSD_BFSK_theoritcal = (2/bit_time)*(FirstDelta +SecondDelta) + (8*cos(pi*bit_time*Freq).^2)./(pi^2 *(4*bit_time^2 * Freq.^2 -1).^2);
+figure('Name','PSD');
+%%%Normalize by 4
+ActaulPSDNormalize = abs(fftshift(fft(stat_autocorr)));
+TheoritcalPSDNormalize = PSD_BFSK_theoritcal;
+plot(FrequencyNoramlize,ActaulPSDNormalize);
+hold on;
+plot (FrequencyNoramlize,TheoritcalPSDNormalize);
+title("BFSK PSD");
+xlabel("Frequency (Hz)");
+ylabel("PSD");
+ylim([0,2]);
+legend('Actual PSD' , 'Theoretical PSD')
+saveas(gcf, fullfile('G:\Comm3', 'PSD.jpg'),'jpg');
+
+%%%%%%%
+
+
