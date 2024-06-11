@@ -21,4 +21,27 @@ the input bit stream and the BER is calculated.
 
 ## Generate constellations 
 ![3](https://github.com/faatthy/Single-Carrier-System-/assets/110846097/2637c60f-9ef2-4b7a-88d3-9ff749a5202e)
+![4](https://github.com/faatthy/Single-Carrier-System-/assets/110846097/9b4e9918-a4ac-4a09-b230-e5b8315ba654)
+
+## BPSK Vs QPSK Vs 8PSK Vs 16QAM BER 
+![image](https://github.com/faatthy/Single-Carrier-System-/assets/110846097/aeda56e6-b2a4-4d19-9502-2fef6df671ac)
+ presents a comparison among four different constellations. Both BPSK and QPSK demonstrate 
+the expected similarity in Bit Error Rate (BER), confirming that QPSK is more efficient due to its narrower 
+bandwidth compared to BPSK. However, 8PSK exhibits a higher bit error rate than QPSK. This is because, 
+beyond QPSK, increasing the number of bits improves bandwidth efficiency at the expense of increasing 
+the BER. 
+16QAM, although having the largest BER, demonstrates the highest bandwidth efficiency. It is also the 
+most effective scheme for transmitting a large number of bits, as its constellation optimally utilizes 
+space, resulting in lower energy consumption compared to other modulation schemes when 
+transmitting the same large number of bits.
+
+## Gray Vs Non Gray QPSK BER
+![image](https://github.com/faatthy/Single-Carrier-System-/assets/110846097/61e215f2-72f8-4879-9c2b-4bc61921d1b3)
+Gray QPSK ensures that adjacent symbols differ by only one bit, leading to smoother transitions 
+between symbols and lower Bit Error Rate (BER). In contrast, Non-Gray QPSK allows symbols to differ by 
+more than one bit, resulting in larger transitions between adjacent symbols and consequently higher 
+BER
+
+## BPSK 
+![image](https://github.com/faatthy/Single-Carrier-System-/assets/110846097/7fccbf17-f0cf-4392-aeba-2f3cd8742329)
 
