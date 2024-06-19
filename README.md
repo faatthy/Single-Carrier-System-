@@ -123,3 +123,103 @@ BER
     <td></td>
   </tr>
 </table>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signal Table</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Signal Table</h2>
+
+<table>
+    <tr>
+        <th>Signal Name</th>
+        <th>Width (bits)</th>
+    </tr>
+    <tr>
+        <td>parameterized</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>parameterized</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>parameterized</td>
+    </tr>
+    <tr>
+        <td>ALU_FUNC</td>
+        <td>4</td>
+    </tr>
+    <tr>
+        <td>CLK</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>RST</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>Arith_OUT</td>
+        <td>parameterized</td>
+    </tr>
+    <tr>
+        <td>Arith_Flag</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>Carry_OUT</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>Logic_OUT</td>
+        <td>parameterized</td>
+    </tr>
+    <tr>
+        <td>Logic_Flag</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>CMP_OUT</td>
+        <td>parameterized</td>
+    </tr>
+    <tr>
+        <td>CMP_Flag</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>SHIFT_OUT</td>
+        <td>parameterized</td>
+    </tr>
+    <tr>
+        <td>SHIFT_Flag</td>
+        <td>1</td>
+    </tr>
+</table>
+
+<h3>Specifications:</h3>
+<p>● All Outputs are registered.</p>
+<p>1</p>
+
+</body>
+</html>
